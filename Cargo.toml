@@ -1,0 +1,18 @@
+[package]
+name = "allseer-rs"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+chrono = "0.4.38"
+color-eyre = "0.6.3"
+dotenv = "0.15.0"
+env_logger = "0.11.3"
+octocrab = "0.38.0"
+regex = "1.10.4"
+serenity = { version = "0.12.1", features = ["client", "gateway", "rustls_backend", "model", "collector"] }
+time = { version = "0.3.36", features = ["macros"] }
+tokio = { version = "1.37.0", features = ["full"] }
+tracing = { version = "0.1.40", features = ["attributes"] }
+tracing-error = "0.2.0"
+tracing-subscriber = { version = "0.3.18", features = ["env-filter", "time", "local-time"] }
