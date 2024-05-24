@@ -11,6 +11,8 @@ use utils::handler::Handler;
 
 use tracing::{debug, error, info};
 
+use crate::handle_interaction::InteractionType;
+
 mod commands;
 mod handle_interaction;
 mod utils;
@@ -27,8 +29,14 @@ impl EventHandler for Handler {
                         .ok();
                     None
                 }
-                "pr" => {
-                    commands::pr::run(&ctx, command, self.context_map.clone())
+                "comments" => {
+                    commands::comments::run(&ctx, command, self.context_map.clone())
+                        .await
+                        .ok();
+                    None
+                }
+                "fetch" => {
+                    commands::fetch::run(&ctx, command, self.context_map.clone())
                         .await
                         .ok();
                     None
@@ -56,6 +64,10 @@ impl EventHandler for Handler {
                         let context_map = self.context_map.lock().await;
                         if let Some(context) = context_map.get(&number) {
                             debug!("Context for {}: {:?}", number, context);
+
+                            let component_interaction = InteractionType::ComponentInteraction(
+                                component_interaction.clone(),
+                            );
 
                             let _ = handle_interaction::run(
                                 &ctx,
@@ -89,7 +101,8 @@ impl EventHandler for Handler {
                 vec![
                     commands::ping::register(),
                     commands::search::register(),
-                    commands::pr::register(),
+                    commands::comments::register(),
+                    commands::fetch::register(),
                 ],
             )
             .await;
