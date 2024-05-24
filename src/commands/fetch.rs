@@ -53,10 +53,7 @@ pub async fn run(
 
     // store whether it's an issue or PR in context so it can be retrieved
     // during the interaction
-    context.insert(
-        number.try_into().unwrap_or(1),
-        HashContext { is_issue: issue },
-    );
+    context.insert(number, HashContext { is_issue: issue });
 
     let context_map = context_map.lock().await;
 
