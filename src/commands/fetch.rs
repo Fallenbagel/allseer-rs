@@ -86,7 +86,7 @@ pub fn register() -> CreateCommand {
             .required(true),
         )
         .add_option(
-            CreateCommandOption::new(CommandOptionType::Integer, "number", "The issue/pr number")
+            CreateCommandOption::new(CommandOptionType::Integer, "#", "The issue/pr number")
                 .required(true),
         )
 }
