@@ -1,14 +1,21 @@
 use regex::Regex;
-use serenity::all::{ComponentInteraction, CreateEmbedAuthor, CreateInteractionResponse};
+use serenity::all::{
+    CommandInteraction, ComponentInteraction, CreateEmbedAuthor, CreateInteractionResponse,
+};
 use serenity::builder::{CreateEmbed, CreateEmbedFooter, CreateInteractionResponseMessage};
 use serenity::prelude::*;
 use tracing::debug;
 
 use crate::utils::handler::HashContext;
 
+pub enum InteractionType {
+    ComponentInteraction(ComponentInteraction),
+    CommandInteraction(CommandInteraction),
+}
+
 pub async fn run(
     ctx: &Context,
-    interaction: &ComponentInteraction,
+    interaction: InteractionType,
     number: u64,
     context: &HashContext,
 ) -> Result<(), color_eyre::Report> {
@@ -69,7 +76,14 @@ pub async fn run(
 
     let builder = CreateInteractionResponse::Message(message);
 
-    interaction.create_response(&ctx.http, builder).await?;
+    match interaction {
+        InteractionType::ComponentInteraction(interaction) => {
+            interaction.create_response(&ctx.http, builder).await?;
+        }
+        InteractionType::CommandInteraction(interaction) => {
+            interaction.create_response(&ctx.http, builder).await?;
+        }
+    }
 
     Ok(())
 }
