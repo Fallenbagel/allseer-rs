@@ -86,8 +86,8 @@ pub async fn run(
 }
 
 pub fn register() -> CreateCommand {
-    CreateCommand::new("pr")
-        .description("Get the diff of a PR")
+    CreateCommand::new("comments")
+        .description("Get comments for a pr")
         .add_option(
             CreateCommandOption::new(
                 CommandOptionType::String,
