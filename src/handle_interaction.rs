@@ -19,7 +19,7 @@ pub async fn run(
     ctx: &Context,
     interaction: InteractionType,
     number: u64,
-    context: &HashContext,
+    _context: &HashContext,
 ) -> Result<(), color_eyre::Report> {
     let page = octocrab::instance()
         .issues("Fallenbagel", "jellyseerr")
@@ -60,21 +60,30 @@ pub async fn run(
         }
     }
 
+    let mut pr = false;
+
+    if page.pull_request.is_some() {
+        pr = true;
+    }
+
     embed = embed
         .title(format!(
             "{} #{}",
-            if context.is_issue { "Issue" } else { "PR" },
+            if pr { "PR" } else { "Issue" },
             page.number,
         ))
         .description(format!(
             "### [{}]({})\n{}",
             page.title, page.html_url, sanitized_body
         ))
-        .colour(10181046)
         .author(author)
         .footer(footer);
 
-    println!("interaction: {:#?}", interaction);
+    if page.state == octocrab::models::IssueState::Open {
+        embed = embed.colour(3066993);
+    } else if page.state == octocrab::models::IssueState::Closed {
+        embed = embed.colour(15158332);
+    }
 
     match interaction {
         InteractionType::ComponentInteraction(interaction) => {
@@ -92,6 +101,8 @@ pub async fn run(
             }
         }
         InteractionType::CommandInteraction(interaction) => {
+            // let ref_page = &page.pull_request;
+            // panic!("{:#?}", ref_page);
             let builder = CreateInteractionResponseFollowup::new().embed(embed);
 
             // interaction.create_response(&ctx.http, builder).await?;

@@ -44,16 +44,12 @@ pub async fn run(
 
     interaction.create_response(&ctx.http, builder).await?;
 
-    println!("Before locking context_map");
-
     {
         let mut context = context_map.lock().await;
-        println!("Locked context_map, current state: {:?}", context);
 
         // Store whether it's an issue or PR in context so it can be retrieved
         // during the interaction
         context.insert(number, HashContext { is_issue: issue });
-        println!("Inserted into context_map, new state: {:?}", context);
     }
 
     // store whether it's an issue or PR in context so it can be retrieved
@@ -61,8 +57,6 @@ pub async fn run(
     // context.insert(number, HashContext { is_issue: issue });
 
     let context_map = context_map.lock().await;
-
-    println!("{:?}", context_map);
 
     if let Some(context) = context_map.get(&number) {
         debug!("Context for {}: {:?}", number, context);

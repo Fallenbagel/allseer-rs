@@ -129,7 +129,7 @@ async fn main() -> Result<(), color_eyre::Report> {
         .expect("Err creating client");
 
     if let Err(why) = client.start().await {
-        println!("Client error: {:?}", why);
+        panic!("Client error: {:?}", why);
     }
 
     Ok(())
