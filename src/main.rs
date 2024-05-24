@@ -108,6 +108,7 @@ impl EventHandler for Handler {
             .await;
 
         debug!("{commands:#?}");
+        println!("{commands:#?}")
     }
 }
 

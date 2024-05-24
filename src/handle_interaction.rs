@@ -1,13 +1,15 @@
 use regex::Regex;
 use serenity::all::{
     CommandInteraction, ComponentInteraction, CreateEmbedAuthor, CreateInteractionResponse,
+    CreateInteractionResponseFollowup, CreateMessage, EditInteractionResponse,
 };
 use serenity::builder::{CreateEmbed, CreateEmbedFooter, CreateInteractionResponseMessage};
 use serenity::prelude::*;
-use tracing::debug;
+use tracing::{debug, error};
 
 use crate::utils::handler::HashContext;
 
+#[derive(Debug)]
 pub enum InteractionType {
     ComponentInteraction(ComponentInteraction),
     CommandInteraction(CommandInteraction),
@@ -72,16 +74,37 @@ pub async fn run(
         .author(author)
         .footer(footer);
 
-    let message = CreateInteractionResponseMessage::new().embed(embed);
-
-    let builder = CreateInteractionResponse::Message(message);
+    println!("interaction: {:#?}", interaction);
 
     match interaction {
         InteractionType::ComponentInteraction(interaction) => {
-            interaction.create_response(&ctx.http, builder).await?;
+            let message = CreateInteractionResponseMessage::new().embed(embed);
+
+            let builder = CreateInteractionResponse::Message(message);
+
+            if let Err(why) = interaction.create_response(&ctx.http, builder).await {
+                error!("Error sending response: {:?}", why);
+
+                let error_message =
+                    EditInteractionResponse::new().content("Error finding issues/prs");
+
+                interaction.edit_response(&ctx.http, error_message).await?;
+            }
         }
         InteractionType::CommandInteraction(interaction) => {
-            interaction.create_response(&ctx.http, builder).await?;
+            let builder = CreateInteractionResponseFollowup::new().embed(embed);
+
+            // interaction.create_response(&ctx.http, builder).await?;
+            if let Err(why) = interaction.create_followup(&ctx.http, builder).await {
+                error!("Error sending response: {:?}", why);
+
+                let error_message = CreateMessage::new().content("Error finding issues/prs");
+
+                interaction
+                    .channel_id
+                    .send_message(&ctx.http, error_message)
+                    .await?;
+            }
         }
     }
 

@@ -44,8 +44,6 @@ pub async fn run(
             body.truncate(256);
         }
 
-        // let mut response = MessageBuilder::new();
-
         let author = CreateEmbedAuthor::new(&item.user.login)
             .url(format!("https://github.com/{}", item.user.login))
             .icon_url(item.user.avatar_url);
